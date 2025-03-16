@@ -3,9 +3,9 @@
     public partial class Mutation
     {
 
-        public async Task<String> TestWork()
+        public String TestWork(string ms)
         {
-            return "is work";
+            return ms;
         }
     }
 }
