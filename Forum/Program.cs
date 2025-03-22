@@ -8,7 +8,7 @@ using Microsoft.AspNetCore.Authentication.Negotiate;
 using Microsoft.EntityFrameworkCore;
 using System.Text;
 using Microsoft.AspNetCore.Authorization;
-using Forum.Model;
+using Forum.Model.Services;
 
 
 var builder = WebApplication.CreateBuilder(args);
@@ -35,12 +35,12 @@ builder.Services.AddAuthentication(options =>
         ValidateIssuerSigningKey = true,
         ValidIssuer = builder.Configuration["Jwt:Issuer"],
         ValidAudience = builder.Configuration["Jwt:Issuer"],
-        IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(builder.Configuration["Jwt:Key"]))
+        IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(builder.Configuration["Jwt:Key"]!))
     };
 });
 
 
-builder.Services.AddScoped<Forum.Model.IAuthorizationService, AuthorizationService>();
+builder.Services.AddScoped<Forum.Model.Services.IAuthorizationService, AuthorizationService>();
 
 
 //builder.Services.AddAuthorization(options =>
@@ -60,14 +60,34 @@ builder.Services.AddAuthorization(options =>
 builder.Services.AddDbContext<ForumDBContext>(options =>
     options.UseNpgsql(builder.Configuration.GetConnectionString("DefaultConnection")));
 
+//redis
+
+var redisConfig = builder.Configuration.GetSection("Redis");
+
+builder.Services.AddStackExchangeRedisCache(options => {
+    options.Configuration = redisConfig["Configuration"];
+    options.InstanceName = redisConfig["InstanceName"];
+});
+
+
+
+
+
 //graphQL
 builder.Services
     .AddGraphQLServer()
+
+
     .AddQueryType<Query>()
     .AddTypeExtension<UsersQuery>()
+    .AddTypeExtension<PostsQuery>()
+    .AddTypeExtension<PostPartialQuery>()
+
        .AddMutationType<Mutation>()
        .AddTypeExtension<Authorization>()
-       .AddAuthorization()
+
+
+    .AddAuthorization()
     .AddProjections()
     .AddFiltering()
     .AddSorting();
@@ -100,6 +120,9 @@ app.UseAuthentication();
 app.UseAuthorization();
 
 app.UseCors();
+
+
+
 
 app.UseRouting();
 

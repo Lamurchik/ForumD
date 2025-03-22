@@ -7,7 +7,7 @@ using System.Text;
 using System.IdentityModel.Tokens.Jwt;
 using Microsoft.IdentityModel.Tokens;
 
-namespace Forum.Model
+namespace Forum.Model.Services
 {
 
     public interface IAuthorizationService
@@ -35,12 +35,13 @@ namespace Forum.Model
 
         public async Task<string> Login(string email, string password)
         {
-            User? user = await _dbContext.Users.AsNoTracking().FirstOrDefaultAsync(u => u.Email == email);
+            User? user = await _dbContext.Users.Include(u => u.Role).FirstOrDefaultAsync(u => u.Email == email);
             if (user == null || !BCrypt.Net.BCrypt.Verify(password, user.Password))
             {
                 throw new ArgumentException("Неверный email или пароль");
             }
 
+            var role = user.Role.RoleName;
             string jwt = GenerateJwtToken(user, user.Role.RoleName);
 
             return jwt;

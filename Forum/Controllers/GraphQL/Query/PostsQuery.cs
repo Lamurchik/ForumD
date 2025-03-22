@@ -1,22 +1,18 @@
 ﻿using Forum.Model.DB;
-using HotChocolate.Authorization;
 
 namespace Forum.Controllers.GraphQL.Query
 {
     [ExtendObjectType(typeof(Query))]
-    public class UsersQuery
+    public class PostsQuery
     {
 
-        [AllowAnonymous]
         [UseProjection]
         [UseSorting]
         [UseFiltering]
-        public  IQueryable<User> GetUsers ([Service] ForumDBContext context)
+        public IQueryable<Post> GetPosts([Service] ForumDBContext context)
         {
-            return context.Users;
+            return context.Posts;
         }
-
-      
 
     }
 }

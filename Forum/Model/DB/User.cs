@@ -17,6 +17,9 @@ namespace Forum.Model.DB
 
         public ICollection<Subscriptions>? Subscribers { get; set; }
         */
+
+
+        public ICollection<Post>? Posts { get; set; }
         public UserInfo? UserInfo { get; set; }
     }
 }

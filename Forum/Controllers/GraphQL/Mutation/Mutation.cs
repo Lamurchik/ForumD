@@ -3,9 +3,6 @@
     public partial class Mutation
     {
 
-        public String TestWork(string ms)
-        {
-            return ms;
-        }
+        
     }
 }
