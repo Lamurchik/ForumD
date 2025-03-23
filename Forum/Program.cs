@@ -9,6 +9,8 @@ using Microsoft.EntityFrameworkCore;
 using System.Text;
 using Microsoft.AspNetCore.Authorization;
 using Forum.Model.Services;
+using Forum.Model;
+using Microsoft.Extensions.Caching.Distributed;
 
 
 var builder = WebApplication.CreateBuilder(args);
@@ -76,12 +78,17 @@ builder.Services.AddStackExchangeRedisCache(options => {
 //graphQL
 builder.Services
     .AddGraphQLServer()
-
-
+     .UseField(next => async context =>
+    {
+        var cache = context.Service<IDistributedCache>();
+        var middleware = new GraphQLCacheMiddleware(next, cache);
+        await middleware.InvokeAsync(context);
+    })
     .AddQueryType<Query>()
     .AddTypeExtension<UsersQuery>()
     .AddTypeExtension<PostsQuery>()
     .AddTypeExtension<PostPartialQuery>()
+
 
        .AddMutationType<Mutation>()
        .AddTypeExtension<Authorization>()

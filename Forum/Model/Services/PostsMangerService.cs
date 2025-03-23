@@ -34,6 +34,7 @@ namespace Forum.Model.Services
         }
 
 
+        #region update
 
         public async Task<string> PostTitleChange(int postId, string newTitle)
         {
@@ -93,13 +94,13 @@ namespace Forum.Model.Services
             }
         }
 
+        #endregion
 
+        #region вспомогательные методы 
         public string GetFilePath(string fileName)
         {
             return Path.Combine(AppContext.BaseDirectory, "wwwroot", "Images", fileName);
         }
-
-
         private async Task<string> SaveFileAsync(IFile file)
         {
             if (file == null || file.Length == 0)
@@ -120,7 +121,7 @@ namespace Forum.Model.Services
 
             return fileName; // Возвращаем абсолютный путь
         }
-
+        #endregion
 
         #region создание поста
 

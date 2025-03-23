@@ -15,8 +15,5 @@ namespace Forum.Controllers.GraphQL.Query
         {
             return context.Users;
         }
-
-      
-
     }
 }
