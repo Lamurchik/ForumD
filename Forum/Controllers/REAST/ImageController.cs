@@ -1,4 +1,5 @@
-﻿using Microsoft.AspNetCore.Http;
+﻿using Forum.Model.Services;
+using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.StaticFiles;
 
@@ -10,9 +11,9 @@ namespace Forum.Controllers.REAST
     {
 
         [HttpGet("image/{fileName}")]
-        public IActionResult GetImage(string fileName)
+        public IActionResult GetImage([Service] PostsMangerService postsManger, string fileName)
         {
-            var filePath = System.IO.Path.Combine("wwwroot", "Images", fileName);
+            var filePath = postsManger.GetFilePath(fileName);
             if (!System.IO.File.Exists(filePath))
                 return NotFound();
 

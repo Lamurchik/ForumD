@@ -2,6 +2,7 @@
 
 namespace Forum.Model.DB
 {
+    //сделать превью
     public class Post
     {
         public int Id { get; set; }

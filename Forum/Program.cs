@@ -17,6 +17,8 @@ var builder = WebApplication.CreateBuilder(args);
 
 // Add services to the container.
 
+#region регистрация сервисов 
+
 builder.Services.AddControllers();
 // Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
 builder.Services.AddEndpointsApiExplorer();
@@ -41,20 +43,28 @@ builder.Services.AddAuthentication(options =>
     };
 });
 
-
+builder.Services.AddAuthorization(options =>
+{
+    // Не требовать авторизации по умолчанию, если это допустимо
+    options.FallbackPolicy = new AuthorizationPolicyBuilder().RequireAssertion(_ => true).Build();
+});
 builder.Services.AddScoped<Forum.Model.Services.IAuthorizationService, AuthorizationService>();
 
+
+
+#endregion
+
+#region регистрация  DI
+
+
+
+builder.Services.AddScoped<PostsMangerService>();
 
 //builder.Services.AddAuthorization(options =>
 //{
 //    options.FallbackPolicy = options.DefaultPolicy;
 //});
 
-builder.Services.AddAuthorization(options =>
-{
-    // Не требовать авторизации по умолчанию, если это допустимо
-    options.FallbackPolicy = new AuthorizationPolicyBuilder().RequireAssertion(_ => true).Build();
-});
 
 
 //бд
@@ -72,10 +82,11 @@ builder.Services.AddStackExchangeRedisCache(options => {
 });
 
 
+#endregion
 
 
+#region graphQL
 
-//graphQL
 builder.Services
     .AddGraphQLServer()
      .UseField(next => async context =>
@@ -84,21 +95,26 @@ builder.Services
         var middleware = new GraphQLCacheMiddleware(next, cache);
         await middleware.InvokeAsync(context);
     })
+     //запросы
     .AddQueryType<Query>()
     .AddTypeExtension<UsersQuery>()
     .AddTypeExtension<PostsQuery>()
     .AddTypeExtension<PostPartialQuery>()
 
-
+    //мутации
        .AddMutationType<Mutation>()
        .AddTypeExtension<Authorization>()
-
-
+       .AddTypeExtension<PostsMutation>()
+       .AddType<UploadType>()
+//атрибуты
     .AddAuthorization()
     .AddProjections()
     .AddFiltering()
     .AddSorting();
 
+#endregion
+
+//cors политика 
 builder.Services.AddCors(options =>
 {
     options.AddDefaultPolicy(policy =>
@@ -109,7 +125,12 @@ builder.Services.AddCors(options =>
     });
 });
 
+
+
 var app = builder.Build();
+
+
+#region настройка сервисов 
 
 // Configure the HTTP request pipeline.
 if (app.Environment.IsDevelopment())
@@ -128,13 +149,12 @@ app.UseAuthorization();
 
 app.UseCors();
 
-
-
-
 app.UseRouting();
 
 app.MapGraphQL("/graphql");
 
 app.MapControllers();
+
+#endregion
 
 app.Run();
