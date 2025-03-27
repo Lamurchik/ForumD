@@ -13,15 +13,19 @@ namespace Forum.Model.DB
         public int? ParentCommentId { get; set; } // Идентификатор родительского комментария (если это ответ)
 
         [ForeignKey("User")]
-        public int UserId { get; set; } // Идентификатор пользователя, оставившего комментарий
+        public required int UserId { get; set; } // Идентификатор пользователя, оставившего комментарий
 
         [ForeignKey("Post")]
-        public int PostId { get; set; } // Идентификатор поста, к которому относится комментарий
-        public required User User { get; set; }
-        public required Post Post { get; set; }
+        public required int PostId { get; set; } // Идентификатор поста, к которому относится комментарий
+        public ICollection<Grade>? Grades { get; set; }
+        public  User? User { get; set; }
+        public  Post? Post { get; set; }
 
         public DateTime CommentDate { get; set; } // Дата комментария     
         public TimeOnly CommentTime { get; set; } // Время комментария
+
+        [NotMapped]
+        public string GetImage { get => Image != null ? $"https://localhost:7143/api/Image/image/{Image}" : ""; }
 
     }
 }

@@ -25,5 +25,12 @@ namespace Forum.Model.DB
         public ICollection<Comment>? Comments { get; set; }
 
         public ICollection<Tags>? Tags { get; set; }
+
+        public string? Image { get; set; }
+        [NotMapped]
+
+        public string GetImage { get => Image != null ? $"https://localhost:7143/api/Image/image/{Image}" : ""; }
+
+
     }
 }

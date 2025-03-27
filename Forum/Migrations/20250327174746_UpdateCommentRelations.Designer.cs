@@ -3,6 +3,7 @@ using System;
 using Forum.Model.DB;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 
@@ -11,9 +12,11 @@ using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 namespace Forum.Migrations
 {
     [DbContext(typeof(ForumDBContext))]
-    partial class ForumDBContextModelSnapshot : ModelSnapshot
+    [Migration("20250327174746_UpdateCommentRelations")]
+    partial class UpdateCommentRelations
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -111,12 +114,6 @@ namespace Forum.Migrations
                     b.Property<int?>("CommentId")
                         .HasColumnType("integer");
 
-                    b.Property<DateTime>("GradeDate")
-                        .HasColumnType("timestamp with time zone");
-
-                    b.Property<TimeOnly>("GradeTime")
-                        .HasColumnType("time without time zone");
-
                     b.Property<bool>("IsLike")
                         .HasColumnType("boolean");
 
@@ -150,9 +147,6 @@ namespace Forum.Migrations
 
                     b.Property<DateTime?>("DateCreate")
                         .HasColumnType("timestamp with time zone");
-
-                    b.Property<string>("Image")
-                        .HasColumnType("text");
 
                     b.Property<TimeOnly>("TimeCreate")
                         .HasColumnType("time without time zone");

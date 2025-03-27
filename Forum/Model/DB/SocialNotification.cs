@@ -6,14 +6,12 @@ namespace Forum.Model.DB
     {
         public int Id { get; set; }
         public required string Title { get; set; }
-
         public required string Message { get; set; }
 
         [ForeignKey("Post")]
         public int PostId { get; set; }
-
-       
-        public required Post Post { get; set; }
+  
+        public  Post? Post { get; set; }
 
        // public required string Link { get; set; }// нужно ли?
 

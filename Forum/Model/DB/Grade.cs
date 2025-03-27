@@ -10,11 +10,13 @@ namespace Forum.Model.DB
         [ForeignKey("Comment")]
         public int? CommentId { get; set; }
         [ForeignKey("User")]
-        public int UserId { get; set; }
-
+        public required int UserId { get; set; }
         public  Post? Post { get; set; }
         public Comment? Comment { get; set; }
-        public required User User { get; set; }
+        public  User? User { get; set; }
         public required bool IsLike  { get; set; }
+
+        public DateTime GradeDate { get; set; } // Дата комментария     
+        public TimeOnly GradeTime { get; set; } // Время комментария
     }
 }

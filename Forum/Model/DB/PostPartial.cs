@@ -14,5 +14,8 @@ namespace Forum.Model.DB
         public PostPartialType PostPartialType { get; set; } //в бд будет отдельная бд для enum 
         public required string Body { get; set; }
         public int Order {  get; set; } // порядок кусочков 
+
+        [NotMapped]
+        public string GetImage { get => PostPartialType ==PostPartialType.Image ?  $"https://localhost:7143/api/Image/image/{Body}" : "" ; }
     }
 }
