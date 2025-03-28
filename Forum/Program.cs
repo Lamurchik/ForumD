@@ -48,7 +48,6 @@ builder.Services.AddAuthorization(options =>
     // Не требовать авторизации по умолчанию, если это допустимо
     options.FallbackPolicy = new AuthorizationPolicyBuilder().RequireAssertion(_ => true).Build();
 });
-builder.Services.AddScoped<Forum.Model.Services.IAuthorizationService, AuthorizationService>();
 
 
 
@@ -57,8 +56,13 @@ builder.Services.AddScoped<Forum.Model.Services.IAuthorizationService, Authoriza
 #region регистрация  DI
 
 
+builder.Services.AddScoped<Forum.Model.Services.IAuthorizationService, AuthorizationService>();
 
 builder.Services.AddScoped<PostsMangerService>();
+
+builder.Services.AddScoped<ICommentManager, CommentManagerService>();
+
+builder.Services.AddScoped<IGrateService, GradeService>();
 
 //builder.Services.AddAuthorization(options =>
 //{
@@ -105,6 +109,9 @@ builder.Services
        .AddMutationType<Mutation>()
        .AddTypeExtension<Authorization>()
        .AddTypeExtension<PostsMutation>()
+       .AddTypeExtension<GradeMutation>()
+       .AddTypeExtension<CommentMutation>()
+
        .AddType<UploadType>()
 //атрибуты
     .AddAuthorization()

@@ -10,14 +10,14 @@ namespace Forum.Model.Services
     {
         //public  Task<string>
 
-        public  Task<string> AddComment(InputComment ic, IFile? file);
+        public  Task<string> AddCommentAsync(InputComment ic, IFile? file);
 
-        public  Task<string> ChangeComment(int commId, string? body, IFile? file);
+        public  Task<string> ChangeCommentAsync(int commId, string? body, IFile? file);
 
-        public Task<string> DeleteComment(int comId);
+        public Task<string> DeleteCommentAsync(int comId);
 
     }
-
+    
     public class InputComment
     {       
         public required string Body { get; set; } // Текст комментария
@@ -93,7 +93,7 @@ namespace Forum.Model.Services
         #endregion
        
 
-        public async Task<string> AddComment(InputComment ic, IFile? file)
+        public async Task<string> AddCommentAsync(InputComment ic, IFile? file)
         {
             Comment comment = new Comment()
             { 
@@ -112,7 +112,7 @@ namespace Forum.Model.Services
             return $"comment added whit id:{comment.Id}";
         }
 
-        public async Task<string> ChangeComment(int commId,string? body, IFile? file)
+        public async Task<string> ChangeCommentAsync(int commId,string? body, IFile? file)
         {
             var comm = await _dbContext.Comments.FirstOrDefaultAsync(c=> c.Id==commId);
             if (comm == null) throw new ArgumentException("comment not found");
@@ -129,11 +129,13 @@ namespace Forum.Model.Services
             return $"comment update";
         }
 
-        public async Task<string> DeleteComment(int commId)
+        public async Task<string> DeleteCommentAsync(int commId)
         {
             var comm = await _dbContext.Comments.FirstOrDefaultAsync(c => c.Id == commId);
             if(comm == null) throw new ArgumentException("comment not found");
             _dbContext.Comments.Remove(comm);
+
+            await _dbContext.SaveChangesAsync();
             return "comment Delete";
         }
     }

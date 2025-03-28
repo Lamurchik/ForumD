@@ -54,9 +54,9 @@ namespace Forum.Controllers.GraphQL.Mutation
     
 
         [Authorize(Roles = new[] {RoleAndPoliceName.admin })]
-        public string AdminTestHotCH()
+        public string AdmenTestHotCH()
         {
-            return "you admin";
+            return "you admen";
         }
 
     }
