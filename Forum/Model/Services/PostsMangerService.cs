@@ -274,14 +274,14 @@ namespace Forum.Model.Services
 
 
 
-        public async Task<string> PostCreateAsync(string title, int userId, string keyPostPartials)
+        public async Task<string> PostCreateAsync(string title, int userId, string keyPostPartials, IFile? file)
         {
              var cacheData   = await _cache.GetStringAsync(keyPostPartials);
             if(cacheData ==null) throw new ArgumentException("Invalid key value");
             try 
             {
                 List<PostPartial>? postPartials = JsonSerializer.Deserialize<List<PostPartial>>(cacheData);
-                return await PostCreateAsync(title, userId, postPartials!);
+                return await PostCreateAsync(title, userId, postPartials!, file);
             }
             catch
             {
@@ -289,16 +289,20 @@ namespace Forum.Model.Services
             }           
         }
 
-        private async Task<string> PostCreateAsync(string title, int userId, ICollection <PostPartial>  postPartials)
+        private async Task<string> PostCreateAsync(string title, int userId, ICollection <PostPartial>  postPartials, IFile? file)
         {
-            Post post = new Post() 
+            Post post = new Post()
             {
-                Title =title,
+                Title = title,
                 UserAuthorId = userId,
                 PostPartials = new List<PostPartial>(),
                 DateCreate = DateTime.UtcNow.Date,
-                TimeCreate = TimeOnly.FromDateTime(DateTime.Now)
-            };
+                TimeCreate = TimeOnly.FromDateTime(DateTime.Now),
+                Image = file != null ? await SaveFileAsync(file) : null
+
+            }; 
+
+           
 
             foreach (var partial in postPartials)
             {

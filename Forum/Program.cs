@@ -11,6 +11,9 @@ using Microsoft.AspNetCore.Authorization;
 using Forum.Model.Services;
 using Forum.Model;
 using Microsoft.Extensions.Caching.Distributed;
+using Forum.Controllers.GraphQL.Subscription;
+
+
 
 
 var builder = WebApplication.CreateBuilder(args);
@@ -58,11 +61,13 @@ builder.Services.AddAuthorization(options =>
 
 builder.Services.AddScoped<Forum.Model.Services.IAuthorizationService, AuthorizationService>();
 
-builder.Services.AddScoped<PostsMangerService>();
+builder.Services.AddScoped<PostsMangerService>(); //сделать интерфейс
 
 builder.Services.AddScoped<ICommentManager, CommentManagerService>();
 
 builder.Services.AddScoped<IGrateService, GradeService>();
+
+builder.Services.AddScoped<SubscriptionService>();
 
 //builder.Services.AddAuthorization(options =>
 //{
@@ -85,7 +90,6 @@ builder.Services.AddStackExchangeRedisCache(options => {
     options.InstanceName = redisConfig["InstanceName"];
 });
 
-
 #endregion
 
 
@@ -93,6 +97,7 @@ builder.Services.AddStackExchangeRedisCache(options => {
 
 builder.Services
     .AddGraphQLServer()
+    .AddInMemorySubscriptions()
      .UseField(next => async context =>
     {
         var cache = context.Service<IDistributedCache>();
@@ -103,14 +108,18 @@ builder.Services
     .AddQueryType<Query>()
     .AddTypeExtension<UsersQuery>()
     .AddTypeExtension<PostsQuery>()
+    .AddTypeExtension<RoleQuery>()
     .AddTypeExtension<PostPartialQuery>()
-
-    //мутации
+    
+       //мутации
        .AddMutationType<Mutation>()
        .AddTypeExtension<Authorization>()
        .AddTypeExtension<PostsMutation>()
        .AddTypeExtension<GradeMutation>()
        .AddTypeExtension<CommentMutation>()
+
+        //подписки
+        .AddSubscriptionType<Subscription>()
 
        .AddType<UploadType>()
 //атрибуты
@@ -145,6 +154,8 @@ if (app.Environment.IsDevelopment())
     app.UseSwagger();
     app.UseSwaggerUI();
 }
+
+app.UseWebSockets();
 
 app.UseStaticFiles();
 

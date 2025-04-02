@@ -15,9 +15,9 @@ namespace Forum.Controllers.GraphQL.Mutation
             return result;
         }
 
-        public async Task<string> PostCreate([Service] PostsMangerService postsManger, string title, int userId, string keyPostPartials)
+        public async Task<string> PostCreate([Service] PostsMangerService postsManger, string title, int userId, string keyPostPartials, IFile? file)
         {
-            var result = await postsManger.PostCreateAsync(title, userId, keyPostPartials);
+            var result = await postsManger.PostCreateAsync(title, userId, keyPostPartials, file);
 
             return result;
         }

@@ -22,8 +22,8 @@ namespace Forum.Model.Services
         public required int UserId { get; set; }
         public required bool IsLike { get; set; }
 
-        public static DateTime GradeDate { get => DateTime.UtcNow.Date; } // Дата комментария     
-        public static TimeOnly GradeTime { get => TimeOnly.FromDateTime(DateTime.Now); } // Время комментария
+        public static DateTime GradeDate { get => DateTime.UtcNow.Date; }  
+        public static TimeOnly GradeTime { get => TimeOnly.FromDateTime(DateTime.Now); } 
     }
 
 
