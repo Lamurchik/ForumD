@@ -61,13 +61,16 @@ builder.Services.AddAuthorization(options =>
 
 builder.Services.AddScoped<Forum.Model.Services.IAuthorizationService, AuthorizationService>();
 
-builder.Services.AddScoped<PostsMangerService>(); //сделать интерфейс
+builder.Services.AddScoped<IPostsMangerService,PostsMangerService>(); //сделать интерфейс
 
 builder.Services.AddScoped<ICommentManager, CommentManagerService>();
 
 builder.Services.AddScoped<IGrateService, GradeService>();
 
 builder.Services.AddScoped<SubscriptionService>();
+
+
+builder.Services.AddScoped<SearchService>();
 
 //builder.Services.AddAuthorization(options =>
 //{

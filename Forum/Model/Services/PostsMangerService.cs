@@ -3,6 +3,7 @@ using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Caching.Distributed;
 using StackExchange.Redis;
 using System.Collections.Generic;
+using System.ComponentModel.DataAnnotations.Schema;
 using System.Data;
 using System.Text.Json;
 using Path = System.IO.Path;
@@ -11,15 +12,31 @@ namespace Forum.Model.Services
 {
     public interface IPostsMangerService
     {
-    
-    
-    
+        public Task<string> PostCreateAsync(PostInput postInput, IFile? titleImage);
+
+        public Task<string> PostUpdateAsync(int postId, string? Body, string? title, IFile? titleImage);
+
+        public Task<string> PostDeleteAsync(int postId);
+
+
     }
 
-    
-    //не тестилось 
+    public class PostInput
+    {       
+        public required string Title { get; set; }
+        public static DateTime Date { get => DateTime.UtcNow.Date; } // Дата   
+        public static TimeOnly Time { get => TimeOnly.FromDateTime(DateTime.Now); } // Время 
+        [ForeignKey("User")]
+        public required int UserAuthorId { get; set; } // Идентификатор автора поста (ссылается на пользователя)
 
-    public class PostsMangerService
+        public required string Body { get; set; }
+        public string? Image { get; set; }
+     
+    }
+
+
+
+    public class PostsMangerService : IPostsMangerService
     {
 
         private ForumDBContext _dbContext;
@@ -34,6 +51,119 @@ namespace Forum.Model.Services
             _cache = cache;
         }
 
+
+        public async Task<string> PostCreateAsync(PostInput postInput, IFile? titleImage)
+        {
+            var post = new Post()
+            {
+                Title = postInput.Title,
+                UserAuthorId = postInput.UserAuthorId,
+                Body = postInput.Body,
+                TitleImage = titleImage ==null ? null : await SaveFileAsync(titleImage),
+                DateCreate = PostInput.Date,
+                TimeCreate = PostInput.Time                
+            };
+            _dbContext.Posts.Add(post);
+
+            await _dbContext.SaveChangesAsync();
+
+
+            return "post added";
+
+        }
+
+        public async Task<string> PostUpdateAsync(int postId, string? Body, string? title, IFile? titleImage)
+        {
+            var post = await _dbContext.Posts.FirstOrDefaultAsync(p => p.Id == postId);
+
+            if (post == null) throw new ArgumentException("object not found");
+
+
+            //нужен анализ тела при редактирование картинки 
+            if(Body!=null) post.Body = Body;
+            if(title!=null) post.Title = title;
+            if(titleImage!=null)
+            {
+                if(post.TitleImage!=null) DeleteFile(post.TitleImage);
+                post.TitleImage = await SaveFileAsync(titleImage);
+            }
+
+            await _dbContext.SaveChangesAsync();
+
+            return "postChange";
+        }
+
+        public async Task<string> PostDeleteAsync(int postId)
+        {
+            var post = await _dbContext.Posts.FirstOrDefaultAsync(p => p.Id == postId);
+
+            if (post == null) throw new ArgumentException("object not found");
+            //произойдёт ли коскадное удаление
+            _dbContext.Posts.Remove(post!);
+
+            await _dbContext.SaveChangesAsync();
+
+            return "post deleted";
+        }
+
+        #region вспомогательные методы 
+        public string GetFilePath(string fileName)
+        {
+            return Path.Combine(AppContext.BaseDirectory, "wwwroot", "Images", fileName);
+        }
+        private async Task<string> SaveFileAsync(IFile file)
+        {
+            if (file == null || file.Length == 0)
+            {
+                throw new ArgumentException("Файл пуст или не был загружен.");
+            }
+
+            string imageDirectory = Path.Combine(AppContext.BaseDirectory, "wwwroot", "Images");
+            Directory.CreateDirectory(imageDirectory); // Создаём папку, если её нет
+
+            string fileName = $"{Guid.NewGuid()}{Path.GetExtension(file.Name)}"; // Уникальное имя
+            string filePath = Path.Combine(imageDirectory, fileName);
+
+            using (var stream = new FileStream(filePath, FileMode.Create))
+            {
+                await file.CopyToAsync(stream);
+            }
+
+            return fileName;
+        }
+        public bool DeleteFile(string filePath)
+        {
+            if (File.Exists(filePath))
+            {
+                try
+                {
+                    File.Delete(filePath);
+                    return true;
+                }
+                catch (Exception ex)
+                {
+                    // Логирование ошибки (если нужно)
+                    Console.WriteLine($"Ошибка при удалении файла: {ex.Message}");
+                    return false;
+                }
+            }
+            else
+            {
+                // Файл не найден
+                return false;
+            }
+        }
+
+
+
+        #endregion
+
+
+
+
+
+        //не актуальыные методы 
+        /*
         #region delete
 
 
@@ -169,56 +299,7 @@ namespace Forum.Model.Services
 
         #endregion
 
-        #region вспомогательные методы 
-        public string GetFilePath(string fileName)
-        {
-            return Path.Combine(AppContext.BaseDirectory, "wwwroot", "Images", fileName);
-        }
-        private async Task<string> SaveFileAsync(IFile file)
-        {
-            if (file == null || file.Length == 0)
-            {
-                throw new ArgumentException("Файл пуст или не был загружен.");
-            }
-
-            string imageDirectory = Path.Combine(AppContext.BaseDirectory, "wwwroot", "Images");
-            Directory.CreateDirectory(imageDirectory); // Создаём папку, если её нет
-
-            string fileName = $"{Guid.NewGuid()}{Path.GetExtension(file.Name)}"; // Уникальное имя
-            string filePath = Path.Combine(imageDirectory, fileName);
-
-            using (var stream = new FileStream(filePath, FileMode.Create))
-            {
-                await file.CopyToAsync(stream);
-            }
-
-            return fileName; 
-        }
-        public bool DeleteFile(string filePath)
-        {
-            if (File.Exists(filePath))
-            {
-                try
-                {
-                    File.Delete(filePath);
-                    return true;
-                }
-                catch (Exception ex)
-                {
-                    // Логирование ошибки (если нужно)
-                    Console.WriteLine($"Ошибка при удалении файла: {ex.Message}");
-                    return false;
-                }
-            }
-            else
-            {
-                // Файл не найден
-                return false;
-            }
-        }
         
-
-        #endregion
 
         #region создание поста
 
@@ -267,7 +348,7 @@ namespace Forum.Model.Services
             await _dbContext.SaveChangesAsync();
             return "Tags added";
         }
-        */
+        
 
 
 
@@ -377,5 +458,6 @@ namespace Forum.Model.Services
             return key;
         }
         #endregion
+        */
     }
 }

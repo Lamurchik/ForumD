@@ -98,7 +98,7 @@ namespace Forum.Model.Services
         }
 
         //ответ на пост
-        public async Task Postpostented(InputComment ic)
+        public async Task PostComment(InputComment ic)
         {
             var userName = _context.Users.FirstOrDefaultAsync(u => u.Id == ic.UserId).Result?.NickName;
             var post = (await _context.Posts.FirstOrDefaultAsync(u => u.Id == ic.PostId));

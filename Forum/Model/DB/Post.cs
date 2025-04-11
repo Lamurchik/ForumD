@@ -16,8 +16,10 @@ namespace Forum.Model.DB
         public required int UserAuthorId { get; set; } // Идентификатор автора поста (ссылается на пользователя)
         public  User? User { get; set; }
 
-        [UseSorting]
-        public required ICollection<PostPartial> PostPartials { get; set; }
+        //[UseSorting]
+        //public required ICollection<PostPartial> PostPartials { get; set; }
+
+        public required string Body { get; set; }
         public ICollection<Grade>? Grades { get; set; }
 
         [UseFiltering]
@@ -26,10 +28,10 @@ namespace Forum.Model.DB
 
         public ICollection<Tags>? Tags { get; set; }
 
-        public string? Image { get; set; }
+        public string? TitleImage { get; set; }
         [NotMapped]
 
-        public string GetImage { get => Image != null ? $"https://localhost:7143/api/Image/image/{Image}" : ""; }
+        public string GetImage { get => TitleImage != null ? $"https://localhost:7143/api/Image/image/{TitleImage}" : ""; }
 
 
     }
