@@ -13,10 +13,9 @@ namespace Forum.Controllers.GraphQL.Mutation
             return str;
         }
 
-        public string  TestPy([Service] SearchService searchService, string input)
-        {
-            searchService.Tets(input);
-            return searchService.Tets(input); 
+        public async Task <List<string>> TestPy([Service] SearchService searchService, string input)
+        {           
+            return await searchService.ProcessTextAsync(input);
         }
 
     }

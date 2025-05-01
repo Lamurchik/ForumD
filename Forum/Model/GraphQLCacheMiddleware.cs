@@ -5,6 +5,10 @@ using System.Text;
 using System.Security.Cryptography;
 using Microsoft.EntityFrameworkCore;
 using HotChocolate.Language;
+using Forum.Model.DB;
+using Microsoft.Extensions.Options;
+using System.Collections.Generic;
+using System.ComponentModel;
 
 namespace Forum.Model
 {
@@ -37,14 +41,18 @@ namespace Forum.Model
             if (cachedResult != null)
             {
                 // Определяем тип результата
-                var resultType = context.Selection.Field.RuntimeType;
+                
 
-                // Десериализуем в нужный тип
-                var result = JsonSerializer.Deserialize(cachedResult, resultType, new JsonSerializerOptions { PropertyNameCaseInsensitive = true });
+                    var resultType = context.Selection.Field.RuntimeType;
 
-                context.Result = result;
-                Console.WriteLine("отработал redis");
-                return;
+                    // Десериализуем в нужный тип
+                    var result = JsonSerializer.Deserialize(cachedResult, resultType, new JsonSerializerOptions { PropertyNameCaseInsensitive = true });
+
+                    context.Result = result;
+                    Console.WriteLine("отработал redis");
+                    return;
+                
+                
             }
 
             // Если в кэше нет данных, выполняем следующий middleware
@@ -77,11 +85,22 @@ namespace Forum.Model
                     AbsoluteExpirationRelativeToNow = TimeSpan.FromMinutes(1)
                 });
             }
+            //else if(context.Result != null) //для другого типа 
+            //{
+            //    var resultType = context.Result.GetType();
 
+            //    // Проверим, не является ли это Connection<T>
+            //    if (resultType.IsGenericType && resultType.GetGenericTypeDefinition().Name.StartsWith("Connection"))
+            //    {
+            //        var resultJson = JsonSerializer.Serialize(context.Result);
+            //        await _cache.SetStringAsync(cacheKey, resultJson, new DistributedCacheEntryOptions
+            //        {
+            //            AbsoluteExpirationRelativeToNow = TimeSpan.FromMinutes(1)
+            //        });
+            //    }
+            //}
         }
-
-
-        //не работает при смени пармметров 
+       
         private string GenerateCacheKey(IMiddlewareContext context)
         {
             var sb = new StringBuilder();

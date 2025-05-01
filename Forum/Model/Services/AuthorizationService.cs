@@ -9,16 +9,30 @@ using Microsoft.IdentityModel.Tokens;
 
 namespace Forum.Model.Services
 {
+    public class LoginAnswer
+    { 
+        public string? Token { get; set; }
+        public int? Id { get; set; }
+        public string? Message { get; set; }
+
+    }
+
+
 
     public interface IAuthorizationService
     {
-        public Task<string> Login(string email, string password);
+        public Task<LoginAnswer> Login(string email, string password);
 
         public Task<bool> Register(string nickName, string email, string password);
 
         public Task<bool> ChangeRole(int userId, int roleId);
 
-    }
+        public string RefrashJwt(string role, string id);
+        
+
+
+
+        }
 
 
     public class AuthorizationService : IAuthorizationService
@@ -33,7 +47,7 @@ namespace Forum.Model.Services
         }
 
 
-        public async Task<string> Login(string email, string password)
+        public async Task<LoginAnswer> Login(string email, string password)
         {
             User? user = await _dbContext.Users.Include(u => u.Role).FirstOrDefaultAsync(u => u.Email == email);
             if (user == null || !BCrypt.Net.BCrypt.Verify(password, user.Password))
@@ -42,9 +56,12 @@ namespace Forum.Model.Services
             }
 
             var role = user.Role.RoleName;
-            string jwt = GenerateJwtToken(user, user.Role.RoleName);
+            string jwt = GenerateJwtToken(user.Id, user.Role.RoleName);
+            int id = user.Id;
 
-            return jwt;
+            var answer = new LoginAnswer() { Id =  id, Token = jwt };
+
+            return answer;
         }
 
         //добавить кэш к Role
@@ -102,15 +119,20 @@ namespace Forum.Model.Services
             return true;
         }
 
+        //можно произввести проверку на бан
+        public string RefrashJwt(string role, string id)
+        {
+            return GenerateJwtToken(int.Parse(id), role);
+        }
 
-        private string GenerateJwtToken(User user, string role)
+        private string GenerateJwtToken(int userId, string role)
         {
             var claims = new[]
             {
            // new Claim(JwtRegisteredClaimNames.Sub, user.Username),
             new Claim(JwtRegisteredClaimNames.Jti, Guid.NewGuid( ).ToString()),
             new Claim(ClaimTypes.Role, role),
-            new Claim(ClaimTypes.NameIdentifier, user.Id.ToString())
+            new Claim(ClaimTypes.NameIdentifier, userId.ToString())
 
             };
             //var q = _configuration["Jwt:Key"];
@@ -121,7 +143,7 @@ namespace Forum.Model.Services
                 issuer: _configuration["Jwt:Issuer"],
                 audience: _configuration["Jwt:Issuer"],
                 claims: claims,
-                expires: DateTime.Now.AddMinutes(30),
+                expires: DateTime.Now.AddDays(7),
                 signingCredentials: creds);
 
             return new JwtSecurityTokenHandler().WriteToken(token);

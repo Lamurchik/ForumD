@@ -69,8 +69,8 @@ builder.Services.AddScoped<IGrateService, GradeService>();
 
 builder.Services.AddScoped<SubscriptionService>();
 
-
 builder.Services.AddScoped<SearchService>();
+
 
 //builder.Services.AddAuthorization(options =>
 //{
@@ -107,7 +107,7 @@ builder.Services
         var middleware = new GraphQLCacheMiddleware(next, cache);
         await middleware.InvokeAsync(context);
     })
-     //запросы
+    //запросы
     .AddQueryType<Query>()
     .AddTypeExtension<UsersQuery>()
     .AddTypeExtension<PostsQuery>()
@@ -125,7 +125,7 @@ builder.Services
         .AddSubscriptionType<Subscription>()
 
        .AddType<UploadType>()
-//атрибуты
+//атрибуты    
     .AddAuthorization()
     .AddProjections()
     .AddFiltering()

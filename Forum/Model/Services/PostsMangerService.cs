@@ -18,6 +18,7 @@ namespace Forum.Model.Services
 
         public Task<string> PostDeleteAsync(int postId);
 
+        public string GetFilePath(string fileName);
 
     }
 
@@ -30,7 +31,7 @@ namespace Forum.Model.Services
         public required int UserAuthorId { get; set; } // Идентификатор автора поста (ссылается на пользователя)
 
         public required string Body { get; set; }
-        public string? Image { get; set; }
+      //  public string? Image { get; set; }
      
     }
 
