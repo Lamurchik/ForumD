@@ -20,14 +20,26 @@ namespace Forum.Controllers.GraphQL.Query
         //при пагинации не рабтает кэш, я не знаю как пофиксить, слишком много проблем
         // написать отдельную логику ?
         //создать кастомный атрибут 
-        // оставляю как есть. это не возможно 
+        // оставляю как есть. это не возможно
+        // написать свою реализацию 
         [UsePaging(IncludeTotalCount = true)]
         [UseProjection]
         [UseSorting]
         [UseFiltering]
         public IQueryable<Post> GetPostsPaging([Service] ForumDBContext context)
         {
-            return context.Posts;
+            try
+            {
+                return context.Posts;
+            }
+            catch (Exception ex)             
+                { throw new Exception(ex.Message);  }
+        }
+
+        [UseProjection]
+        public IQueryable<Post> GetPostsPagingV2([Service] ForumDBContext context, int userId, int pageNumber = 1, int pageSize =10 )
+        {                  
+            return context.Posts.Where(p => p.UserAuthorId == userId).OrderBy(p=>p.DateCreate).Skip((pageNumber-1)*pageSize).Take(pageSize);       
         }
 
 
