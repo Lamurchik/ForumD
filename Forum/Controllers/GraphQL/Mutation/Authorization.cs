@@ -10,7 +10,8 @@ namespace Forum.Controllers.GraphQL.Mutation
     [ExtendObjectType(typeof(Mutation))]
     public class Authorization
     {
-        public async  Task<string> SignUp([Service] IAuthorizationService authorization, string nickName, string email, string password)
+        public async  Task<string> SignUp([Service] IAuthorizationService authorization, string nickName, 
+            string email, string password)
         {
             try 
             {
@@ -27,14 +28,12 @@ namespace Forum.Controllers.GraphQL.Mutation
             try
             {
                 answer = await authorization.Login(email, password);
-
             }
             catch (Exception ex)
             { 
                 answer.Message = ex.Message;
                 return answer; 
             }
-
             return answer;
         }
         //только админ
@@ -56,19 +55,13 @@ namespace Forum.Controllers.GraphQL.Mutation
         {
             var userId = user.FindFirst(ClaimTypes.NameIdentifier)?.Value;
             var role = user.FindFirst(ClaimTypes.Role)?.Value;
-
             // Здесь можешь использовать userId/role для выдачи нового токена
             return authorization.RefrashJwt(role, userId);
         }
-
-
         [Authorize(Roles = new[] {RoleAndPoliceName.admin })]
         public string AdmenTestHotCH()
         {
             return "you admen";
         }
-
-    }
-
-    
-    }
+    }    
+}

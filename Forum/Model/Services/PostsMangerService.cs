@@ -29,7 +29,6 @@ namespace Forum.Model.Services
         public static TimeOnly Time { get => TimeOnly.FromDateTime(DateTime.Now); } // Время 
         [ForeignKey("User")]
         public required int UserAuthorId { get; set; } // Идентификатор автора поста (ссылается на пользователя)
-
         public required string Body { get; set; }
       //  public string? Image { get; set; }
      

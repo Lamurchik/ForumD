@@ -40,8 +40,6 @@ namespace Forum.Model.Services
             _context = dbContext;
             _sender = sender;
         }
-
-
         public string CreateTitle(NotificationType notificationType)
         {
             
@@ -165,12 +163,6 @@ namespace Forum.Model.Services
 
 
         }
-
-
-
-
-
-
         // не нужный метод?
         public async Task AdjustmentId(SocialNotification socialNotification,int userId)
         {

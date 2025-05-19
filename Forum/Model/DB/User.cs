@@ -11,14 +11,11 @@ namespace Forum.Model.DB
         public required string Password { get; set; }
         public int RoleId { get; set; }
         public required Role Role { get; set; }
-
         /*
         public ICollection< Subscriptions>? Subscriptions { get; set; }
 
         public ICollection<Subscriptions>? Subscribers { get; set; }
         */
-
-
         public ICollection<Post>? Posts { get; set; }
         public UserInfo? UserInfo { get; set; }
     }

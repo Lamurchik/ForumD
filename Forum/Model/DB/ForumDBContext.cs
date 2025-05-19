@@ -7,27 +7,18 @@ namespace Forum.Model.DB
         public DbSet<Post> Posts { get; set; }
         public DbSet<Comment> Comments { get; set; }
         public DbSet<Role> Roles { get; set; }
-        public DbSet<User> Users { get; set; }
-       
+        public DbSet<User> Users { get; set; } 
         public DbSet<UserInfo> UsersInfo { get; set; }
-
         public DbSet<PostPartial> PostPartials { get; set; }
-
         public DbSet<Grade> Grades { get; set; }
-
         public DbSet<Tags> Tags { get; set; }
         public DbSet<SocialNotification> SocialNotifications { get; set; }
-
         public DbSet<Blacklist> Blacklists { get; set; }
-
         //public DbSet<Subscriptions> Subscriptions { get; set; }
-
-
         public ForumDBContext(DbContextOptions<ForumDBContext> options) : base(options) { }
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
-
             modelBuilder.Entity<Grade>(entity =>
             {
                 entity.ToTable("Grade", t => t.HasCheckConstraint(
@@ -38,9 +29,7 @@ namespace Forum.Model.DB
 
             modelBuilder.Entity<Tags>()
                 .HasIndex(t => t.Name)
-                    .IsUnique();
-        
-
+                    .IsUnique();  
             /*
             modelBuilder.Entity<Subscriptions>(entity =>
             {
@@ -69,7 +58,6 @@ namespace Forum.Model.DB
                 .HasForeignKey(s => s.TargetUserId)
                 .OnDelete(DeleteBehavior.Restrict);
             */
-
 
         }
     }

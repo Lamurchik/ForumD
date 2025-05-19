@@ -28,11 +28,7 @@ namespace Forum.Model.Services
         public Task<bool> ChangeRole(int userId, int roleId);
 
         public string RefrashJwt(string role, string id);
-        
-
-
-
-        }
+    }
 
 
     public class AuthorizationService : IAuthorizationService

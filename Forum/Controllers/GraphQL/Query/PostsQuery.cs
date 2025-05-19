@@ -4,6 +4,7 @@ using HotChocolate.Types;
 using HotChocolate.Data;
 using Microsoft.Extensions.Caching.Distributed;
 using StackExchange.Redis;
+using Microsoft.EntityFrameworkCore;
 
 namespace Forum.Controllers.GraphQL.Query
 {
@@ -41,6 +42,8 @@ namespace Forum.Controllers.GraphQL.Query
         {                  
             return context.Posts.Where(p => p.UserAuthorId == userId).OrderBy(p=>p.DateCreate).Skip((pageNumber-1)*pageSize).Take(pageSize);       
         }
+
+
 
 
     }

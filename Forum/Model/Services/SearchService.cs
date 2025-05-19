@@ -3,15 +3,25 @@ using Microsoft.Scripting.Hosting;
 using System.Diagnostics;
 using System.Text.Json;
 using System.Text;
+using Forum.Model.DB;
+using Microsoft.EntityFrameworkCore;
 
 namespace Forum.Model.Services
 {
     public class SearchService
     {
+        private ForumDBContext _dbContext;
         #region лематизация строки запроса 
         string path = $"C:\\Users\\eajli\\OneDrive\\Рабочий стол\\работы в вузе\\диплом\\Forum\\lemma.py";
         //string path = @"C:\Users\eajli\PycharmProjects\PythonProject1\main.py";
         string fileName = @"C:/Users/eajli/PycharmProjects/PythonProject1/.venv/Scripts/python.exe";
+
+
+        public SearchService(ForumDBContext dbContext)
+        {
+            _dbContext = dbContext;
+        }
+
         public async Task<List<string>> ProcessTextAsync(string input)
         {
             var psi = new ProcessStartInfo
@@ -69,6 +79,17 @@ namespace Forum.Model.Services
             return string.Join(" ", args.Select(a => $"\"{a.Replace("\"", "\\\"")}\""));
         }
         #endregion  
+
+        public IQueryable<Post> Search(string searchQuery)
+        {
+            if (string.IsNullOrWhiteSpace(searchQuery)) throw new ArgumentException("Empty search query");
+            var res = _dbContext.Posts
+                .Where(p =>
+                    EF.Functions.ToTsVector("russian", p.Body)
+                        .Matches(EF.Functions.PlainToTsQuery("russian", searchQuery)));
+            return res; 
+               
+        }
 
 
 

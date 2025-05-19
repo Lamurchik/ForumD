@@ -51,13 +51,9 @@ builder.Services.AddAuthorization(options =>
     // Не требовать авторизации по умолчанию, если это допустимо
     options.FallbackPolicy = new AuthorizationPolicyBuilder().RequireAssertion(_ => true).Build();
 });
-
-
-
 #endregion
 
 #region регистрация  DI
-
 
 builder.Services.AddScoped<Forum.Model.Services.IAuthorizationService, AuthorizationService>();
 
@@ -71,14 +67,10 @@ builder.Services.AddScoped<SubscriptionService>();
 
 builder.Services.AddScoped<SearchService>();
 
-
 //builder.Services.AddAuthorization(options =>
 //{
 //    options.FallbackPolicy = options.DefaultPolicy;
 //});
-
-
-
 //бд
 
 builder.Services.AddDbContext<ForumDBContext>(options =>
@@ -95,9 +87,7 @@ builder.Services.AddStackExchangeRedisCache(options => {
 
 #endregion
 
-
 #region graphQL
-
 builder.Services
     .AddGraphQLServer()
     .AddInMemorySubscriptions()
@@ -113,24 +103,22 @@ builder.Services
     .AddTypeExtension<PostsQuery>()
     .AddTypeExtension<RoleQuery>()
     .AddTypeExtension<PostPartialQuery>()
-    
+    .AddTypeExtension<CommentQuery>()
+    .AddType<CommentType>()
        //мутации
        .AddMutationType<Mutation>()
        .AddTypeExtension<Authorization>()
        .AddTypeExtension<PostsMutation>()
        .AddTypeExtension<GradeMutation>()
        .AddTypeExtension<CommentMutation>()
-
         //подписки
         .AddSubscriptionType<Subscription>()
-
        .AddType<UploadType>()
 //атрибуты    
     .AddAuthorization()
     .AddProjections()
     .AddFiltering()
     .AddSorting();
-
 #endregion
 
 //cors политика 
@@ -143,11 +131,7 @@ builder.Services.AddCors(options =>
               .AllowAnyMethod();
     });
 });
-
-
-
 var app = builder.Build();
-
 
 #region настройка сервисов 
 

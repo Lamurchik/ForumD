@@ -7,12 +7,6 @@ namespace Forum.Controllers.GraphQL.Subscription
 
     public class Subscription
     {
-        [Subscribe]
-        public string UserDidSomeThink([EventMessage] string str)
-        {
-            return str;
-        }
-
         /// <summary>
         /// 
         /// </summary>
@@ -20,7 +14,6 @@ namespace Forum.Controllers.GraphQL.Subscription
         /// <param name="userId"> кому это сообщение </param>
         /// <returns></returns>
         /// 
-
         [Subscribe]
         [Topic($"{nameof(ReplyComment)}_{{{nameof(userId)}}}")]
         public async Task<SocialNotification> ReplyComment ([EventMessage] SocialNotification socialNotification, int userId)

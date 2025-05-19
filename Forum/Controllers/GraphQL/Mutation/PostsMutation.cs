@@ -1,36 +1,31 @@
 ﻿using Forum.Model.DB;
 using Forum.Model.Services;
+using HotChocolate.Authorization;
 
 namespace Forum.Controllers.GraphQL.Mutation
 {
     [ExtendObjectType(typeof(Mutation))]
     public class PostsMutation
     {
-
-
-
-        public async Task<string> PostCreate([Service] IPostsMangerService postsManger, PostInput postInput , IFile? file)
+        [Authorize]
+        public async Task<string> PostCreate([Service] IPostsMangerService postsManger, 
+            PostInput postInput , IFile? file)
         {
             var result = await postsManger.PostCreateAsync(postInput, file);
-
             return result;
         }
-        
-
-        public async Task<string> PostUpdate([Service] IPostsMangerService postsManger, int postId, string? Body, string? title, IFile? titleImage)
+        [Authorize]
+        public async Task<string> PostUpdate([Service] IPostsMangerService postsManger, int postId, string?
+            Body, string? title, IFile? titleImage)
         {
             var result = await postsManger.PostUpdateAsync(postId, Body, title, titleImage);
-
             return result;
         }
-
-        
-
+        [Authorize]
         public async Task<string> DeletePost([Service] IPostsMangerService postsManger, int postId)
         {
             return await postsManger.PostDeleteAsync(postId);
         }
- 
         //не актуальный код 
         /*
          
