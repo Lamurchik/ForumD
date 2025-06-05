@@ -35,14 +35,11 @@ namespace Forum.Model.Services
     {
         private ForumDBContext _dbContext;
         private readonly IConfiguration _configuration;
-
         public AuthorizationService(ForumDBContext dbContext, IConfiguration configuration)
         {
             _configuration = configuration;
             _dbContext = dbContext;
         }
-
-
         public async Task<LoginAnswer> Login(string email, string password)
         {
             User? user = await _dbContext.Users.Include(u => u.Role).FirstOrDefaultAsync(u => u.Email == email);
@@ -50,51 +47,60 @@ namespace Forum.Model.Services
             {
                 throw new ArgumentException("Неверный email или пароль");
             }
-
             var role = user.Role.RoleName;
             string jwt = GenerateJwtToken(user.Id, user.Role.RoleName);
             int id = user.Id;
-
             var answer = new LoginAnswer() { Id =  id, Token = jwt };
-
             return answer;
         }
-
         //добавить кэш к Role
         public async Task<bool>  Register(string nickName, string email, string password) 
         {
             User? u = await _dbContext.Users.AsNoTracking().FirstOrDefaultAsync(u=> u.NickName==nickName);
-
             if (u != null)
             {
                 throw new ArgumentException("This Name is already taken");
             }
 
-
+            User? us = await _dbContext.Users.AsNoTracking().FirstOrDefaultAsync(u => u.Email == email);
+            if (us != null)
+            {
+                throw new ArgumentException("This Email is already taken");
+            }
 
             Role? userRole = await _dbContext.Roles.FirstOrDefaultAsync(role => role.RoleName == RoleAndPoliceName.user);
             if (userRole == null) 
             {
-                throw new InvalidOperationException("User role not found");
-
-                //return false;                
-            }
-           
-
+                throw new InvalidOperationException("User role not found");              
+            }   
             string hashPassword = BCrypt.Net.BCrypt.HashPassword(password);
-
-
-            User user = new User { Email = email, Password = hashPassword, NickName= nickName, Role = userRole };
-            
+            User user = new User { Email = email, Password = hashPassword, NickName= nickName, Role = userRole };       
             _dbContext.Users.Add(user);
-
             await _dbContext.SaveChangesAsync();
-
             Console.WriteLine("register is work");
             return true;
         }
+        private string GenerateJwtToken(int userId, string role)
+        {
+            var claims = new[]
+            {
+           // new Claim(JwtRegisteredClaimNames.Sub, user.Username),
+            new Claim(JwtRegisteredClaimNames.Jti, Guid.NewGuid( ).ToString()),
+            new Claim(ClaimTypes.Role, role),
+            new Claim(ClaimTypes.NameIdentifier, userId.ToString())
+            };
+            //var q = _configuration["Jwt:Key"];
+            var key = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(_configuration["Jwt:Key"]));
+            var creds = new SigningCredentials(key, SecurityAlgorithms.HmacSha256);
 
-
+            var token = new JwtSecurityToken(
+                issuer: _configuration["Jwt:Issuer"],
+                audience: _configuration["Jwt:Issuer"],
+                claims: claims,
+                expires: DateTime.Now.AddDays(7),
+                signingCredentials: creds);
+            return new JwtSecurityTokenHandler().WriteToken(token);
+        }
         public async Task<bool> ChangeRole(int userId, int roleId)
         {
             var user = await _dbContext.Users.FirstOrDefaultAsync(u => u.Id == userId);
@@ -114,36 +120,10 @@ namespace Forum.Model.Services
 
             return true;
         }
-
         //можно произввести проверку на бан
         public string RefrashJwt(string role, string id)
         {
             return GenerateJwtToken(int.Parse(id), role);
         }
-
-        private string GenerateJwtToken(int userId, string role)
-        {
-            var claims = new[]
-            {
-           // new Claim(JwtRegisteredClaimNames.Sub, user.Username),
-            new Claim(JwtRegisteredClaimNames.Jti, Guid.NewGuid( ).ToString()),
-            new Claim(ClaimTypes.Role, role),
-            new Claim(ClaimTypes.NameIdentifier, userId.ToString())
-
-            };
-            //var q = _configuration["Jwt:Key"];
-            var key = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(_configuration["Jwt:Key"]));
-            var creds = new SigningCredentials(key, SecurityAlgorithms.HmacSha256);
-
-            var token = new JwtSecurityToken(
-                issuer: _configuration["Jwt:Issuer"],
-                audience: _configuration["Jwt:Issuer"],
-                claims: claims,
-                expires: DateTime.Now.AddDays(7),
-                signingCredentials: creds);
-
-            return new JwtSecurityTokenHandler().WriteToken(token);
-        }
-
     }
 }

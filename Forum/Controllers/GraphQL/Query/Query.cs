@@ -27,6 +27,11 @@ namespace Forum.Controllers.GraphQL.Query
         { 
             return searchService.Search(searchQuery);
         }
+        [UseProjection]
+        public IQueryable<Post> PostDay([Service] SearchService searchService)
+        {
+            return searchService.GetLatestPosts();   
+        }
         
     }
    

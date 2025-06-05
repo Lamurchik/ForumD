@@ -48,6 +48,7 @@ namespace Forum.Model.DB
             descriptor.Field(c => c.CommentDate);
             descriptor.Field(c => c.CommentTime);
             descriptor.Field(c => c.GetImage);
+            descriptor.Field(c=> c.ParentCommentId);
 
             descriptor.Field("likesCount")
                 .Type<IntType>()

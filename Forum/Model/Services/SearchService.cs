@@ -79,20 +79,27 @@ namespace Forum.Model.Services
             return string.Join(" ", args.Select(a => $"\"{a.Replace("\"", "\\\"")}\""));
         }
         #endregion  
-
         public IQueryable<Post> Search(string searchQuery)
         {
-            if (string.IsNullOrWhiteSpace(searchQuery)) throw new ArgumentException("Empty search query");
-            var res = _dbContext.Posts
+            if (string.IsNullOrWhiteSpace(searchQuery))
+                throw new ArgumentException("Empty search query");
+
+            return _dbContext.Posts
                 .Where(p =>
                     EF.Functions.ToTsVector("russian", p.Body)
-                        .Matches(EF.Functions.PlainToTsQuery("russian", searchQuery)));
-            return res; 
-               
+                        .Matches(EF.Functions.PlainToTsQuery("russian", searchQuery))
+                    ||
+                    EF.Functions.ILike(p.Title, $"%{searchQuery}%"));
+
         }
 
 
-
-
+        public IQueryable<Post> GetLatestPosts(int count = 100)
+        {
+            return _dbContext.Posts
+                .OrderByDescending(p => p.DateCreate)
+                .ThenByDescending(p => p.TimeCreate)
+                .Take(count);
+        }
     }
 }

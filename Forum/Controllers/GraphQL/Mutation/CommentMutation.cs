@@ -1,5 +1,6 @@
 ﻿using Forum.Model.DB;
 using Forum.Model.Services;
+using HotChocolate.Authorization;
 using HotChocolate.Subscriptions;
 using Microsoft.EntityFrameworkCore;
 
@@ -8,17 +9,10 @@ namespace Forum.Controllers.GraphQL.Mutation
     [ExtendObjectType(typeof(Mutation))]
     public class CommentMutation
     {
+        
         public async Task<string> AddComment([Service] ForumDBContext context,[Service] SubscriptionService subscriptionService, [Service] ICommentManager commentManager ,
-            InputComment ic, IFile? file)
+            InputComment ic, IFile? file = null)
         {
-            ////вынести эту логику в сервис 
-            //if(ic.ParentCommentId!=null)
-            //{
-            //    var userName =  context.Users.FirstOrDefaultAsync(u => u.Id == ic.UserId).Result?.NickName;                
-            //    string msg = $"user {userName} replied to your comment:{ic.ParentCommentId}.";
-            //    await sender.SendAsync(nameof(Subscription.Subscription.ReplyСomment), msg); 
-            //}
-
             if (ic.ParentCommentId != null)
             {
                 await subscriptionService.ReplyComment(ic);

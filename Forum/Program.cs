@@ -12,6 +12,7 @@ using Forum.Model.Services;
 using Forum.Model;
 using Microsoft.Extensions.Caching.Distributed;
 using Forum.Controllers.GraphQL.Subscription;
+using Forum.Controllers.ActionFilter;
 
 
 
@@ -22,7 +23,11 @@ var builder = WebApplication.CreateBuilder(args);
 
 #region регистрация сервисов 
 
-builder.Services.AddControllers();
+builder.Services.AddControllers(options =>
+{
+    options.Filters.Add<CacheFilter>();
+}
+ );
 // Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();

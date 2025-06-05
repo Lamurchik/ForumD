@@ -82,7 +82,7 @@ namespace Forum.Model
                 context.Result = resultList;
                 await _cache.SetStringAsync(cacheKey, resultJson, new DistributedCacheEntryOptions
                 {
-                    AbsoluteExpirationRelativeToNow = TimeSpan.FromMinutes(1)
+                    AbsoluteExpirationRelativeToNow = TimeSpan.FromSeconds(5)   // FromMinutes(1)
                 });
             }
             //else if(context.Result != null) //для другого типа 

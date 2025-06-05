@@ -25,7 +25,7 @@ namespace Forum.Controllers.REAST
             }
             return PhysicalFile(filePath, contentType);
         }
-        [Authorize( RoleAndPoliceName.user)]
+        //[Authorize( RoleAndPoliceName.user)]
         [HttpPost("upload-image")]
         public async Task<IActionResult> UploadImage(IFormFile upload)
         {

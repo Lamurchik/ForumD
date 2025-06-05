@@ -5,6 +5,8 @@ using HotChocolate.Data;
 using Microsoft.Extensions.Caching.Distributed;
 using StackExchange.Redis;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.AspNetCore.Mvc;
+using Forum.Controllers.ActionFilter;
 
 namespace Forum.Controllers.GraphQL.Query
 {
@@ -27,6 +29,7 @@ namespace Forum.Controllers.GraphQL.Query
         [UseProjection]
         [UseSorting]
         [UseFiltering]
+        //[ServiceFilter(typeof(CacheFilter))] // у HotChocolate своя система 
         public IQueryable<Post> GetPostsPaging([Service] ForumDBContext context)
         {
             try

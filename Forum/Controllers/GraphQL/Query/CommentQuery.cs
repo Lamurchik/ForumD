@@ -6,6 +6,11 @@ namespace Forum.Controllers.GraphQL.Query
     [ExtendObjectType(typeof(Query))]
     public class CommentQuery
     {
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="context"></param>
+        /// <returns></returns>
         [UseProjection]
         [UseSorting]
         [UseFiltering]

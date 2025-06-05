@@ -41,8 +41,7 @@ namespace Forum.Model.Services
             _sender = sender;
         }
         public string CreateTitle(NotificationType notificationType)
-        {
-            
+        {            
             switch(notificationType)
             {
                 case NotificationType.AnswerComment: return "Ответ на коментарий";
@@ -159,9 +158,6 @@ namespace Forum.Model.Services
             SubscriptionInput subscriptionInput = new SubscriptionInput(msg, user.Id, postId, NotificationType.GradeScore);
 
             await _sender.SendAsync($"{nameof(Subscription.GradeScore)}_{user.Id}", CreateNotification(subscriptionInput));
-
-
-
         }
         // не нужный метод?
         public async Task AdjustmentId(SocialNotification socialNotification,int userId)

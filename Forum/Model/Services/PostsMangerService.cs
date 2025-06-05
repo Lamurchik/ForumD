@@ -38,20 +38,15 @@ namespace Forum.Model.Services
 
     public class PostsMangerService : IPostsMangerService
     {
-
         private ForumDBContext _dbContext;
         private readonly IConfiguration _configuration;
         private IDistributedCache _cache;
-        
-
         public PostsMangerService(ForumDBContext dbContext, IConfiguration configuration, IDistributedCache cache)
         {
             _configuration = configuration;
             _dbContext = dbContext;
             _cache = cache;
         }
-
-
         public async Task<string> PostCreateAsync(PostInput postInput, IFile? titleImage)
         {
             var post = new Post()
@@ -64,20 +59,13 @@ namespace Forum.Model.Services
                 TimeCreate = PostInput.Time                
             };
             _dbContext.Posts.Add(post);
-
             await _dbContext.SaveChangesAsync();
-
-
             return "post added";
-
         }
-
         public async Task<string> PostUpdateAsync(int postId, string? Body, string? title, IFile? titleImage)
         {
             var post = await _dbContext.Posts.FirstOrDefaultAsync(p => p.Id == postId);
-
             if (post == null) throw new ArgumentException("object not found");
-
 
             //нужен анализ тела при редактирование картинки 
             if(Body!=null) post.Body = Body;
@@ -87,25 +75,18 @@ namespace Forum.Model.Services
                 if(post.TitleImage!=null) DeleteFile(post.TitleImage);
                 post.TitleImage = await SaveFileAsync(titleImage);
             }
-
             await _dbContext.SaveChangesAsync();
-
             return "postChange";
         }
-
         public async Task<string> PostDeleteAsync(int postId)
         {
             var post = await _dbContext.Posts.FirstOrDefaultAsync(p => p.Id == postId);
-
             if (post == null) throw new ArgumentException("object not found");
             //произойдёт ли коскадное удаление
             _dbContext.Posts.Remove(post!);
-
             await _dbContext.SaveChangesAsync();
-
             return "post deleted";
         }
-
         #region вспомогательные методы 
         public string GetFilePath(string fileName)
         {
@@ -153,16 +134,7 @@ namespace Forum.Model.Services
                 return false;
             }
         }
-
-
-
-        #endregion
-
-
-
-
-
-        //не актуальыные методы 
+        #endregion      
         /*
         #region delete
 

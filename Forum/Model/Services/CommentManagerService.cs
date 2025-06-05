@@ -39,9 +39,6 @@ namespace Forum.Model.Services
         {
             _dbContext = dbContext;
         }
-
-
-
         #region вспомогательные методы 
         public string GetFilePath(string fileName)
         {
@@ -78,21 +75,15 @@ namespace Forum.Model.Services
                 }
                 catch (Exception ex)
                 {
-                    // Логирование ошибки (если нужно)
-                    Console.WriteLine($"Ошибка при удалении файла: {ex.Message}");
                     return false;
                 }
             }
             else
             {
-                // Файл не найден
                 return false;
             }
         }
-
-        #endregion
-       
-
+        #endregion      
         public async Task<string> AddCommentAsync(InputComment ic, IFile? file)
         {
             Comment comment = new Comment()
@@ -128,7 +119,6 @@ namespace Forum.Model.Services
 
             return $"comment update";
         }
-
         public async Task<string> DeleteCommentAsync(int commId)
         {
             var comm = await _dbContext.Comments.FirstOrDefaultAsync(c => c.Id == commId);
